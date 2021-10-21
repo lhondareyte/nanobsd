@@ -1,7 +1,7 @@
 #
 # This file is part of the spectro-450 Project.
 #
-# Copyright (c)2016-2017  Luc Hondareyte
+# Copyright (c)2016-2021  Luc Hondareyte
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,11 @@ NANOSCRIPT = $(NANODIR)/nanobsd.sh
 IDENT      = NANOBSD
 MACHINE    != uname -m
 KERNEL     = kernel.$(MACHINE)
-NANOCFG    = nanobsd.conf
+TARGET    := nanobsd
+NANOCFG    = $(TARGET)/nanobsd.conf
 DISKIMAGE  = /usr/obj/nanobsd.$(IDENT)/_.disk.full 
 
-nanobsd:
+all:
 	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
 	@/bin/sh $(NANOSCRIPT) -c $(NANOCFG)
 
