@@ -1,7 +1,7 @@
 #
 # This file is part of the spectro-450 Project.
 #
-# Copyright (c)2016-2021  Luc Hondareyte
+# Copyright (c)2016-2022  Luc Hondareyte
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,33 +31,43 @@ DEVICE     = /dev/da0
 NANODIR    = /usr/src/tools/tools/nanobsd
 NANOSCRIPT = $(NANODIR)/nanobsd.sh
 IDENT      = NANOBSD
-MACHINE    != uname -m
+MACHINE   != uname -m
 KERNEL     = kernel.$(MACHINE)
-TARGET    := nanobsd
-NANOCFG    = $(TARGET)/nanobsd.conf
+NANOCFG    = nanobsd.conf
 DISKIMAGE  = /usr/obj/nanobsd.$(IDENT)/_.disk.full 
 
-all:
+SUBDIRS    = generic spectro450
+
+usage:
+        @printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
+
+$(SUBDIRS) :
+        cp ./$@/nanobsd.conf $(NANOCFG)
+
+.PHONY: $(SUBDIRS)
+
+all: $(SUBDIRS)
 	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
 	@/bin/sh $(NANOSCRIPT) -c $(NANOCFG)
 
-world:
+world: $(SUBDIRS)
 	@/bin/sh $(NANOSCRIPT) -k -i -c $(NANOCFG)
 
-kernel:
+kernel: $(SUBDIRS)
 	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
 	@/bin/sh $(NANOSCRIPT) -w -i -c $(NANOCFG)
 
-diskimage:
+diskimage: $(SUBDIRS)
 	@/bin/sh $(NANOSCRIPT) -k -w -b -c $(NANOCFG)
 	@mv $(DISKIMAGE) nanobsd.img
 
-install: 
+install:  $(SUBDIRS)
 	@printf "Writing image to disk..."
 	@dd if=nanobsd.img of=$(DEVICE) bs=64k > /dev/null 2>&1
 	@echo "done."
 
 clean:
 	@printf "Cleaning tree ..."
-	@rm -rf /usr/obj/nanobsd.$(IDENT) nanobsd.img nanobsd.env $(NANODIR)/Pkg/*.txz
+	@rm -rf /usr/obj/nanobsd.$(IDENT) nanobsd.img nanobsd.env $(NANOCFG) $(NANODIR)/Pkg/*.txz
 	@echo "done."
+
