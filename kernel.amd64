@@ -72,12 +72,21 @@ options 	SMP			# Symmetric MultiProcessor Kernel
 device		cpufreq
 
 # Bus support.
-device		acpi
 #device		eisa
+device		acpi
 device		pci
 
 # Floppy drives
 #device		fdc
+
+#
+# Temperature sensors:
+# 
+# coretemp: on-die sensor on Intel Core and newer CPUs
+# amdtemp: on-die sensor on AMD K8/K10/K11 CPUs
+#
+device          coretemp
+device          amdtemp
 
 # ATA controllers
 device		ahci		# AHCI-compatible SATA controllers
