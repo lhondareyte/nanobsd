@@ -42,7 +42,8 @@ usage:
         @printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
 
 $(SUBDIRS) :
-        cp ./$@/nanobsd.conf $(NANOCFG)
+	cp ./generic/nanobsd.conf .
+        [ -f ./$@/local.conf ] && cp ./$@/local.conf .
 
 .PHONY: $(SUBDIRS)
 
@@ -68,6 +69,9 @@ install:  $(SUBDIRS)
 
 clean:
 	@printf "Cleaning tree ..."
-	@rm -rf /usr/obj/nanobsd.$(IDENT) nanobsd.img nanobsd.env $(NANOCFG) $(NANODIR)/Pkg/*.txz
+	@rm -rf /usr/obj/nanobsd.$(IDENT) local.conf nanobsd.env $(NANOCFG) $(NANODIR)/Pkg/*.txz
 	@echo "done."
+
+mrproper: clean
+	@rm -rf nanobsd.img
 
