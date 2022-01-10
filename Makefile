@@ -47,22 +47,22 @@ $(SUBDIRS) :
 
 .PHONY: $(SUBDIRS)
 
-all: $(SUBDIRS)
+all: 
 	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
 	@/bin/sh $(NANOSCRIPT) -c $(NANOCFG)
 
-world: $(SUBDIRS)
+world:
 	@/bin/sh $(NANOSCRIPT) -k -i -c $(NANOCFG)
 
-kernel: $(SUBDIRS)
+kernel:
 	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
 	@/bin/sh $(NANOSCRIPT) -w -i -c $(NANOCFG)
 
-diskimage: $(SUBDIRS)
+diskimage:
 	@/bin/sh $(NANOSCRIPT) -k -w -b -c $(NANOCFG)
 	@mv $(DISKIMAGE) nanobsd.img
 
-install:  $(SUBDIRS)
+install: 
 	@printf "Writing image to disk..."
 	@dd if=nanobsd.img of=$(DEVICE) bs=64k > /dev/null 2>&1
 	@echo "done."
