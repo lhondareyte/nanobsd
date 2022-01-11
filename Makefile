@@ -39,11 +39,11 @@ DISKIMAGE  = /usr/obj/nanobsd.$(IDENT)/_.disk.full
 SUBDIRS    = generic spectro450
 
 usage:
-        @printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
+	@printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
 
 $(SUBDIRS) :
-	cp ./generic/nanobsd.conf .
-        [ -f ./$@/local.conf ] && cp ./$@/local.conf .
+	[ -f ./$@/local.conf ] && cp ./$@/local.conf . || /usr//bin/true
+	[ -f ./$@/$(NANOCFG) ] && cp ./$@/$(NANOCFG) . || cp generic/$(NANOCFG) .
 
 .PHONY: $(SUBDIRS)
 
@@ -69,9 +69,9 @@ install:
 
 clean:
 	@printf "Cleaning tree ..."
-	@rm -rf /usr/obj/nanobsd.$(IDENT) local.conf nanobsd.env $(NANOCFG) $(NANODIR)/Pkg/*.txz
+	@rm -rf local.conf nanobsd.env $(NANOCFG) 
 	@echo "done."
 
 mrproper: clean
-	@rm -rf nanobsd.img
+	@rm -rf nanobsd.img /usr/obj/nanobsd.$(IDENT) $(NANODIR)/Pkg/*.txz
 
