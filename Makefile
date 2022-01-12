@@ -27,16 +27,20 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+IDENT      = NANOBSD
 DEVICE     = /dev/da0
+
+#
+# Include local.conf if exist
+-include local.conf
+
 NANODIR    = /usr/src/tools/tools/nanobsd
 NANOSCRIPT = $(NANODIR)/nanobsd.sh
-IDENT      = NANOBSD
 MACHINE   != uname -m
 KERNEL     = kernel.$(MACHINE)
 NANOCFG    = nanobsd.conf
-DISKIMAGE  = /usr/obj/nanobsd.$(IDENT)/_.disk.full 
-
 SUBDIRS    = generic spectro450
+DISKIMAGE  = /usr/obj/nanobsd.$(IDENT)/_.disk.full 
 
 usage:
 	@printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
