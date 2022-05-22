@@ -10,4 +10,5 @@
 local.conf
 nanobsd.conf
 *.img
+*.img.gz
 nanobsd.env
