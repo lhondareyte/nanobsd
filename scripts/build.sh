@@ -39,7 +39,7 @@ if [ "${TODAY}" != "${DAY}" ] ; then
 fi
 
 touch $LOCK
-cd $NANO_DIR && make $label && sudo make diskimage
+cd $NANO_DIR && make $label && sudo make all
 
 if [ $? -eq 0 ] ; then
    Mail "${label} build completed."
