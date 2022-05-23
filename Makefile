@@ -27,7 +27,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-IDENT      = NANOBSD
 DEVICE     = /dev/da0
 
 #
@@ -40,7 +39,7 @@ MACHINE   != uname -m
 KERNEL     = kernel.$(MACHINE)
 NANOCFG    = nanobsd.conf
 SUBDIRS    = generic spectro450
-DISKIMAGE  = /usr/obj/nanobsd.$(IDENT)/_.disk.full 
+DISKIMAGE  = /usr/obj/nanobsd.$(NANO_NAME)/_.disk.full 
 
 usage:
 	@printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
@@ -52,14 +51,14 @@ $(SUBDIRS) :
 .PHONY: $(SUBDIRS)
 
 all: 
-	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
+	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(NANO_NAME)
 	@/bin/sh $(NANOSCRIPT) -c $(NANOCFG)
 
 world:
 	@/bin/sh $(NANOSCRIPT) -k -i -c $(NANOCFG)
 
 kernel:
-	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(IDENT)
+	@cp $(KERNEL) /usr/src/sys/$(MACHINE)/conf/$(NANO_NAME)
 	@/bin/sh $(NANOSCRIPT) -w -i -c $(NANOCFG)
 
 diskimage:
@@ -73,9 +72,9 @@ install:
 
 clean:
 	@printf "Cleaning tree ..."
-	@rm -rf local.conf nanobsd.env $(NANOCFG) 
+	@rm -rf local.conf $(NANOCFG) 
 	@echo "done."
 
 mrproper: clean
-	@rm -rf nanobsd.img /usr/obj/nanobsd.$(IDENT) $(NANODIR)/Pkg/*.txz
+	@rm -rf nanobsd.img /usr/obj/nanobsd.$(NANO_NAME) $(NANODIR)/Pkg/*.txz
 
