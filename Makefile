@@ -1,6 +1,4 @@
 #
-# This file is part of the spectro-450 Project.
-#
 # Copyright (c)2016-2022  Luc Hondareyte
 # All rights reserved.
 #
@@ -29,24 +27,19 @@
 
 DEVICE     = /dev/da0
 
-#
-# Include local.conf if exist
--include local.conf
-
 NANODIR    = /usr/src/tools/tools/nanobsd
 NANOSCRIPT = $(NANODIR)/nanobsd.sh
-MACHINE   != uname -m
-KERNEL     = kernel.$(MACHINE)
+KERNEL     = kernel.conf
 NANOCFG    = nanobsd.conf
-SUBDIRS    = generic spectro450
+SUBDIRS    = generic spectro450 nginx
 DISKIMAGE  = /usr/obj/nanobsd.$(NANO_NAME)/_.disk.full 
 
 usage:
 	@printf "usage : \n\tmake [ $(SUBDIRS) ] && make all\n"
 
 $(SUBDIRS) :
-	[ -f ./$@/local.conf ] && cp ./$@/local.conf . || /usr//bin/true
 	[ -f ./$@/$(NANOCFG) ] && cp ./$@/$(NANOCFG) . || cp generic/$(NANOCFG) .
+	[ -f ./$@/$(KERNEL)  ] && cp ./$@/$(KERNEL) .  || cp generic/$(KERNEL)  .
 
 .PHONY: $(SUBDIRS)
 
