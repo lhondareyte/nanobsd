@@ -35,6 +35,7 @@ Error() {
 	local msg=$*
 	Mail "$msg"
 	echo $msg
+	rm -f $LOCK
 	exit $rc
 
 }
@@ -51,8 +52,6 @@ if [ "${TODAY}" != "${DAY}" ] ; then
 	Error 0 "Today is not the day."
 fi
 
-touch $LOCK
-
 NANODIR="/usr/src/tools/tools/nanobsd"
 NANOSCRIPT="${NANODIR}/nanobsd.sh"
 KERNEL="${WORKDIR}/${LABEL}/kernel.conf"
@@ -67,7 +66,6 @@ fi
 [ ! -f ${KERNEL} ] && KERNEL="${WORKDIR}/generic/kernel.conf"
 [ -z $NANO_ARCH  ] && NANO_ARCH="amd64"
 DISKIMAGE="/usr/obj/nanobsd.${NANO_NAME}/_.disk.full"
-
 
 case $TARGET in
 	'all')
@@ -91,6 +89,7 @@ case $TARGET in
 		exit 1
 		;;
 esac
+touch $LOCK
 cp $(KERNEL) /usr/src/sys/$(NANO_ARCH)/conf/$(NANO_NAME)
 /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
 
