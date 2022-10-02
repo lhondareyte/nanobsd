@@ -5,7 +5,6 @@ PATH=$PATH:/usr/local/bin
 LABEL=$1
 TARGET=$2
 CONFIG="${HOME}/.etc/build.conf"
-MAIL="no"
 WORKDIR=$(dirname $0)
 
 [ -z $LABEL  ] && exit 0
