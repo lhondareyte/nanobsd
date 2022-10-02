@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 LOCK="/tmp/do_not_shutdown.lk"
-PATH=$PATH:$HOME/bin
+PATH=$PATH:/usr/local/bin
 LABEL=$1
 TARGET=$2
 CONFIG="${HOME}/.etc/build.conf"
@@ -63,8 +63,10 @@ else
 	. $NANOCFG 2>/dev/null
 fi
 
+[ $(id -u) -ne 0 ] && SUDO="sudo"
 [ ! -f ${KERNEL} ] && KERNEL="${WORKDIR}/generic/kernel.conf"
 [ -z $NANO_ARCH  ] && NANO_ARCH="amd64"
+[ -z $NANO_ARCH2 ] && NANO_ARCH2=NANO_ARCH
 DISKIMAGE="/usr/obj/nanobsd.${NANO_NAME}/_.disk.full"
 
 case $TARGET in
@@ -72,13 +74,13 @@ case $TARGET in
 		NANOPT=""
 		;;
 	'world')
-		NANOPT="-k -i -c"
+		NANOPT="-k -i"
 		;;
 	'kernel')
-		NANOPT="-w -i -c"
+		NANOPT="-w -i"
 		;;
 	'diskimage')
-		NANOPT="-k -w -b -c"
+		NANOPT="-k -w -b"
 		mv $DISKIMAGE $WORKDIR
 		;;
 	'install')
@@ -90,7 +92,9 @@ case $TARGET in
 		;;
 esac
 touch $LOCK
-cp $(KERNEL) /usr/src/sys/$(NANO_ARCH)/conf/$(NANO_NAME)
+
+
+${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_ARCH2}/conf/${NANO_KERNEL}
 /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
 
 if [ $rc -eq 0 ] ; then
