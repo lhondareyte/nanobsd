@@ -6,17 +6,25 @@ LABEL=$1
 TARGET=$2
 CONFIG="${HOME}/.etc/build.conf"
 WORKDIR=$(dirname $0)
+SMTPCONFIG="$HOME/.etc/smtp.conf"
+MAILSEND="/usr/local/bin/mailsend"
 
-[ -z $LABEL  ] && exit 0
+[ -z $LABEL  ] && exit 0 
 [ -z $TARGET ] && TARGET="all"
 
 Mail () {
 	if [ $MAIL = "no" ] ; then
 		return
 	fi
+	if [ ! -f $SMTPCONFIG ] ; then
+		return
+	fi
+	if [ ! -x $MAILSEND ] ; then
+		return
+	fi
 	MSG=$1 
-	. $HOME/.etc/smtp.conf
-	printf "${MSG}\nKisses." | mailsend \
+	. $SMTPCONFIG
+	printf "${MSG}\nKisses." | $MAILSEND \
 		-smtp $SERVER \
 		-port $PORT \
 		-starttls \
@@ -36,12 +44,12 @@ Error() {
 	echo $msg
 	rm -f $LOCK
 	exit $rc
-
 }
 
 if [ -f $CONFIG ] ; then
 	. $CONFIG
 else
+	echo "$CONFIG: no such file."
 	exit 0
 fi
 
@@ -65,7 +73,7 @@ fi
 [ $(id -u) -ne 0 ] && SUDO="sudo"
 [ ! -f ${KERNEL} ] && KERNEL="${WORKDIR}/generic/kernel.conf"
 [ -z $NANO_ARCH  ] && NANO_ARCH="amd64"
-[ -z $NANO_ARCH2 ] && NANO_ARCH2=NANO_ARCH
+[ -z $NANO_ARCH2 ] && NANO_ARCH2=$NANO_ARCH
 DISKIMAGE="/usr/obj/nanobsd.${NANO_NAME}/_.disk.full"
 
 case $TARGET in
@@ -80,21 +88,29 @@ case $TARGET in
 		;;
 	'diskimage')
 		NANOPT="-k -w -b"
-		mv $DISKIMAGE $WORKDIR
 		;;
 	'install')
 		dd if=nanobsd.img of=$NANO_DRIVE bs=64k > /dev/null 2>&1
 		;;
 	*)	
-		echo "$(basename $0) [all|world|kernel|diskimage|install]"
+		echo "$(basename $0) <label> [all|world|kernel|diskimage|install]"
 		exit 1
 		;;
 esac
 touch $LOCK
 
-
+cd $WORKDIR
 ${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_ARCH2}/conf/${NANO_KERNEL}
-/bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
+if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
+	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
+	${SUDO} cp ${WORKDIR}/${LABEL}/nanobsd.conf ${NANODIR}/embedded/${LABEL}.cfg
+	cd ${NANODIR}/embedded
+	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${LABEL}.cfg
+	rc=$?
+else
+	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
+	rc=$?
+fi
 
 if [ $rc -eq 0 ] ; then
 	Mail "${LABEL} build completed."
