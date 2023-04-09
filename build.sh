@@ -56,7 +56,7 @@ fi
 TODAY="$(date +%d)"
 
 if [ "${TODAY}" != "${DAY}" ] ; then
-	Error 0 "Today is not the day."
+	Error 0 "Today is the day that I chuck."
 fi
 
 NANODIR="/usr/src/tools/tools/nanobsd"
