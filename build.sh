@@ -1,82 +1,79 @@
 #!/bin/sh
 #
 LOCK="/tmp/do_not_shutdown.lk"
-PATH=$PATH:/usr/local/bin
+PATH=${PATH}:/usr/local/bin
 LABEL=$1
 TARGET=$2
-CONFIG="${HOME}/.etc/build.conf"
 WORKDIR=$(dirname $0)
-SMTPCONFIG="$HOME/.etc/smtp.conf"
+CONFIG="${HOME}/.etc/build.conf"
+SMTPCONFIG="${HOME}/.etc/smtp.conf"
 MAILSEND="/usr/local/bin/mailsend"
-
-[ -z $LABEL  ] && exit 0 
-[ -z $TARGET ] && TARGET="all"
-
-Mail () {
-	if [ $MAIL = "no" ] ; then
-		return
-	fi
-	if [ ! -f $SMTPCONFIG ] ; then
-		return
-	fi
-	if [ ! -x $MAILSEND ] ; then
-		return
-	fi
-	MSG=$1 
-	. $SMTPCONFIG
-	printf "${MSG}\nKisses." | $MAILSEND \
-		-smtp $SERVER \
-		-port $PORT \
-		-starttls \
-		-auth-login \
-		-t "$DEST" \
-		-f "$USER" \
-		-pass $PASSWD \
-		-user $USER \
-		-sub "${LABEL} build" \
-		-name "$FULLNAME"
-}
-
-Error() {
-	local rc=$1 ; shift
-	local msg=$*
-	Mail "$msg"
-	echo $msg
-	rm -f $LOCK
-	exit $rc
-}
-
-if [ -f $CONFIG ] ; then
-	. $CONFIG
-else
-	echo "$CONFIG: no such file."
-	exit 0
-fi
-
-TODAY="$(date +%d)"
-
-if [ "${TODAY}" != "${DAY}" ] ; then
-	Error 0 "Today is the day that I chuck."
-fi
 
 NANODIR="/usr/src/tools/tools/nanobsd"
 NANOSCRIPT="${NANODIR}/nanobsd.sh"
 KERNEL="${WORKDIR}/${LABEL}/kernel.conf"
 NANOCFG="${WORKDIR}/${LABEL}/nanobsd.conf"
 
-if [ ! -d ${WORKDIR}/${LABEL} ] ; then
-	Error 1 "${LABEL} : no such configuration."
-else
-	. $NANOCFG 2>/dev/null
+Usage () {
+	echo "Usage : $(basename $0) <label> [all|world|kernel|diskimage|install]"
+	exit 1
+}
+
+Mail () {
+	MSG=$1 
+	echo ${MSG}
+
+	[ ${MAIL} = "no"     ] && return
+	[ ! -f ${SMTPCONFIG} ] && return
+	[ ! -x ${MAILSEND}   ] && return
+
+	. ${SMTPCONFIG}
+	printf "${MSG}\nKisses." | ${MAILSEND} \
+		-starttls -auth-login \
+		-smtp ${SERVER} \
+		-port ${PORT} \
+		-t "${DEST}" \
+		-f "${USER}" \
+		-pass ${PASSWD} \
+		-user ${USER} \
+		-sub "${LABEL} build" \
+		-name "${FULLNAME}" -q
+
+}
+
+Error() {
+	local rc=$1 ; shift
+	local msg=$*
+	Mail "${msg}"
+	rm -f ${LOCK}
+	exit ${rc}
+}
+
+[ -z ${LABEL}  ] && Usage
+[ -z ${TARGET} ] && TARGET="all"
+
+if [ -f ${CONFIG} ] ; then
+	. ${CONFIG}
+	if [ ! -d ${WORKDIR}/${LABEL} ] ; then
+		Error 1 "${LABEL} : no such configuration."
+	else
+		. ${NANOCFG} 2>/dev/null
+	fi
+	TODAY="$(date +%d)"
+	if [ "${TODAY}" != "${DAY}" ] ; then
+		Error 1 "Today is not the day that I chuck."
+	fi
 fi
 
-[ $(id -u) -ne 0 ] && SUDO="sudo"
-[ ! -f ${KERNEL} ] && KERNEL="${WORKDIR}/generic/kernel.conf"
-[ -z $NANO_ARCH  ] && NANO_ARCH="amd64"
-[ -z $NANO_ARCH2 ] && NANO_ARCH2=$NANO_ARCH
+
+[ $(id -u) -ne 0   ] && SUDO="sudo"
+[ ! -f ${KERNEL}   ] && KERNEL="${WORKDIR}/generic/kernel.conf"
+[ -z ${NANO_ARCH}  ] && NANO_ARCH="amd64"
+[ -z ${NANO_ARCH2} ] && NANO_ARCH2=${NANO_ARCH}
+
 DISKIMAGE="/usr/obj/nanobsd.${NANO_NAME}/_.disk.full"
 
-case $TARGET in
+case ${TARGET} in
 	'all')
 		NANOPT=""
 		;;
@@ -90,16 +87,15 @@ case $TARGET in
 		NANOPT="-k -w -b"
 		;;
 	'install')
-		dd if=nanobsd.img of=$NANO_DRIVE bs=64k > /dev/null 2>&1
+		dd if=nanobsd.img of=${NANO_DRIVE} bs=64k > /dev/null 2>&1
 		;;
 	*)	
-		echo "$(basename $0) <label> [all|world|kernel|diskimage|install]"
-		exit 1
+		Usage
 		;;
 esac
-touch $LOCK
+touch ${LOCK}
 
-cd $WORKDIR
+cd ${WORKDIR}
 ${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_ARCH2}/conf/${NANO_KERNEL}
 if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
 	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
@@ -118,5 +114,5 @@ else
 	Mail "${LABEL} build failed!"
 fi
 
-rm -f $LOCK
+rm -f ${LOCK}
 exit $rc
