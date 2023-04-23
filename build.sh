@@ -54,17 +54,16 @@ Error() {
 
 if [ -f ${CONFIG} ] ; then
 	. ${CONFIG}
-	if [ ! -d ${WORKDIR}/${LABEL} ] ; then
-		Error 1 "${LABEL} : no such configuration."
-	else
-		. ${NANOCFG} 2>/dev/null
-	fi
 	TODAY="$(date +%d)"
 	if [ "${TODAY}" != "${DAY}" ] ; then
 		Error 1 "Today is not the day that I chuck."
 	fi
 fi
-
+if [ ! -d ${WORKDIR}/${LABEL} ] ; then
+	Error 1 "${LABEL} : no such configuration."
+else
+	. ${NANOCFG} 2>/dev/null
+fi
 
 [ $(id -u) -ne 0   ] && SUDO="sudo"
 [ ! -f ${KERNEL}   ] && KERNEL="${WORKDIR}/generic/kernel.conf"
