@@ -21,3 +21,5 @@ The following directories are configuration files for armv7 SOC
     armv7/
     nanopi/
     nginx/
+
+Require Patchs [255639](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=255639) and [271078](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271078)
