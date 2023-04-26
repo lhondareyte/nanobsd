@@ -86,7 +86,7 @@ case ${TARGET} in
 		NANOPT="-k -w -b"
 		;;
 	'install')
-		dd if=nanobsd.img of=${NANO_DRIVE} bs=64k > /dev/null 2>&1
+		dd if=${DISKIMAGE} of=${NANO_DRIVE} bs=64k > /dev/null 2>&1
 		;;
 	*)	
 		Usage
