@@ -52,6 +52,12 @@ Error() {
 [ -z ${LABEL}  ] && Usage
 [ -z ${TARGET} ] && TARGET="all"
 
+case ${LABEL} in
+	'etc'|'termcap')
+		Usage
+		;;
+esac
+
 if [ -f ${CONFIG} ] ; then
 	. ${CONFIG}
 	TODAY="$(date +%d)"
