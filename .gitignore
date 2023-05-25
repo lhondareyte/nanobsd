@@ -4,11 +4,10 @@
 *.xz
 *.tar
 *.o
-*.pdf
-*.eps
 *~
 /nanobsd.conf
 /kernel.conf
 *.img
 *.img.gz
 /nanobsd.env
+.vscode
