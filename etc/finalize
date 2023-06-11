@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# This file is part of the Spectro450 Project.
+#
+# Copyright (c)2019-2022,  Luc Hondareyte
+#
+# PROVIDE: finalize
+# BEFORE: LOGIN
+
+. /etc/rc.subr
+
+name="finalize"
+desc="Finalize NanoBSD configuration"
+start_cmd="app_start"
+stop_cmd="app_stop"
+rcvar="${name}_enable"
+
+PATH=$PATH:/sbin:/usr/sbin
+app_start () {
+	[ ! -f /firstboot ] && return
+	sleep 2
+	printf "$desc ..."
+	sysrc -x growfs_enable
+	sysrc -x finalize_enable
+	/etc/rc.d/hostid start
+	mount /cfg 
+	if [ $? -eq 0 ] ; then
+		# save rc.conf
+		cp /etc/rc.conf /cfg
+		# Avoid hostid generation at each boot
+		cp /etc/hostid /cfg
+	fi
+	umount /cfg
+	mount -o rw /
+	rm -f /firstboot /conf/base/etc/rc.d/finalize 
+	
+	# Fix bug 228826
+	# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=228826
+	kldxref -R /boot > /dev/null 2>&1
+	mount -o ro /
+	echo "done."
+	reboot
+}
+
+
+app_stop() {
+	:
+}
+
+load_rc_config $name
+run_rc_command "$1"
