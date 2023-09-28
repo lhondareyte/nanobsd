@@ -25,7 +25,6 @@ The following directories are configuration files for armv7 SOC
 Require the followings patchs 
 
  * [255639](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=255639) 
- * [271078](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271078)
  * [271098](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271098)
 
 ### u-boot installation
