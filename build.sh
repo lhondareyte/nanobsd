@@ -51,6 +51,7 @@ Error() {
 
 [ -z ${LABEL}  ] && Usage
 [ -z ${TARGET} ] && TARGET="all"
+[ ! -x ${TARGET} ] && Error 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
 	'etc'|'termcap')
