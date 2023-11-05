@@ -54,7 +54,7 @@ Error() {
 [ ! -x ${NANOSCRIPT} ] && Error 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
-	'etc'|'termcap')
+	'etc'|'termcap'|'embedded')
 		Usage
 		;;
 esac
@@ -68,11 +68,16 @@ if [ -f ${CONFIG} ] ; then
 fi
 if [ ! -d ${WORKDIR}/${LABEL} ] ; then
 	Error 1 "${LABEL} : no such configuration."
-else
-	. ${NANOCFG} 2>/dev/null
 fi
 
 [ $(id -u) -ne 0  ] && SUDO="sudo"
+
+if ([ -f ${WORKDIR}/embedded/common ] && [ ${WORKDIR}/${LABEL}/.embedded ]) ; then
+	${SUDO} cp ${WORKDIR}/embedded/common ${NANODIR}/embedded/
+fi
+
+. ${NANOCFG} 2>/dev/null
+
 [ ! -f ${KERNEL}  ] && KERNEL="${WORKDIR}/generic/kernel.conf"
 [ -z ${NANO_ARCH} ] && NANO_ARCH="amd64"
 [ -z ${NANO_MACH} ] && NANO_MACH=${NANO_ARCH}
@@ -110,6 +115,7 @@ if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
 	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${LABEL}.cfg
 	rc=$?
 else
+	echo normal
 	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
 	rc=$?
 fi
