@@ -37,13 +37,17 @@ Options depend of the board, see `/usr/local/share/u-boot/foo/README` for detail
 
 When building an armv7 image in a cross-compiling environment, you cannot install additional packages at build time. This can be achieved manually at run time:
 
-    mount -t nfs Myserver:/With/my/binary/packages /mnt
-    cd /mnt
-    mount -orw /
-    /usr/sbin/pkg install nginx-1.24.0_6.txz
-    
-Optionnaly, you can save the current `pkg` database:
+First, increase `var` size:
 
-    cp /var/db/pkg/local.sqlite /conf/base/var/db/pkg/local.sqlite
-    mount -oro /
+    mount -orw /
+    echo 163840 > /conf/base/var/md_size
+
+Second, reboot an install your package :
+
+    mount -orw /
+    /usr/sbin/pkg install python3
+
+Reset initial `var` size:
+
+    echo 8192 > /conf/base/var/md_size
     
