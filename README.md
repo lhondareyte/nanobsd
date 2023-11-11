@@ -1,11 +1,13 @@
 #  Nanobsd configuration scripts
 
+Scripts and configuration files to build NanoBSD images for amd64 and armv7.
+
 ## Howto
 
 To build a generic `nanobsd` image:
 
     git clone https://github.com/lhondareyte/nanobsd.git  
-    cd nanobsd/etc  && make install
+    cd nanobsd/install  && make install
     cd ..
 
 Edit `$HOME/.etc/build.conf` to set day of month, then
@@ -14,10 +16,10 @@ Edit `$HOME/.etc/build.conf` to set day of month, then
 
 ## ARMv7 plateform
 
-The following directories are configuration files for armv7 SOC
+The following directories are configuration files for armv7 SOC :
 
     armv7/
-    nanopi/
+    nanopi-neo/
 
 Each directory include a patched `common` configuration file that fix the following PRs :
 
