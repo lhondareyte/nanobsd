@@ -33,21 +33,8 @@ The resulting image is not bootable, you need to install the u-boot binary file 
 
 Options depend of the board, see `/usr/local/share/u-boot/foo/README` for details.
 
-### Limitation(s)
+### Optionnal packages
 
-When building an armv7 image in a cross-compiling environment, you cannot install additional packages at build time. This can be achieved manually at run time:
+You can add official packages à build time with `NANO_PACKAGES' option. For example:
 
-First, increase `var` size:
-
-    mount -orw /
-    echo 163840 > /conf/base/var/md_size
-
-Second, reboot an install your package :
-
-    mount -orw /
-    /usr/sbin/pkg install python3
-
-Reset initial `var` size:
-
-    echo 8192 > /conf/base/var/md_size
-    
+    NANO_PACKAGES="nginx modsecurity3-nginx"
