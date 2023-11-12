@@ -28,7 +28,7 @@ Mail () {
 	[ ! -x ${MAILSEND}   ] && return
 
 	. ${SMTPCONFIG}
-	printf "${MSG}\nKisses." | ${MAILSEND} \
+	printf "${MSG}\nKisses.\n\n- Send from $(hostname) -" | ${MAILSEND} \
 		-starttls -auth-login \
 		-smtp ${SERVER} \
 		-port ${PORT} \
@@ -53,7 +53,7 @@ Error() {
 [ ! -x ${NANOSCRIPT} ] && Error 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
-	'etc'|'embedded')
+	'etc'|'install'|'embedded')
 		Usage
 		;;
 esac
