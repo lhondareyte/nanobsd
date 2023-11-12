@@ -8,6 +8,7 @@ WORKDIR=$(dirname $0)
 CONFIG="${HOME}/.etc/build.conf"
 SMTPCONFIG="${HOME}/.etc/smtp.conf"
 MAILSEND="/usr/local/bin/mailsend"
+SUDO="/usr/local/bin/sudo"
 
 NANODIR="/usr/src/tools/tools/nanobsd"
 NANOSCRIPT="${NANODIR}/nanobsd.sh"
@@ -15,14 +16,13 @@ KERNEL="${WORKDIR}/${LABEL}/kernel.conf"
 NANOCFG="${WORKDIR}/${LABEL}/nanobsd.conf"
 
 Usage () {
-	echo "Usage : $(basename $0) <label> [all|world|kernel|diskimage|install]"
+	echo "Usage : $(basename $0) <label> [all|world|kernel|diskimage|burn]"
 	exit 1
 }
 
 Mail () {
 	MSG=$1 
 	echo ${MSG}
-
 	[ ${MAIL} = "no"     ] && return
 	[ ! -f ${SMTPCONFIG} ] && return
 	[ ! -x ${MAILSEND}   ] && return
@@ -38,7 +38,6 @@ Mail () {
 		-user ${USER} \
 		-sub "${LABEL} build" \
 		-name "${FULLNAME}" -q
-
 }
 
 Error() {
@@ -54,10 +53,18 @@ Error() {
 [ ! -x ${NANOSCRIPT} ] && Error 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
-	'etc'|'termcap'|'embedded')
+	'etc'|'embedded')
 		Usage
 		;;
 esac
+
+if [ ! -e $SUDO ] ; then
+	if [ $(id -u) -ne 0 ] ; then
+		Error 1 "Please install 'sudo' or run this script as root"
+	else
+		unset SUDO
+	fi
+fi
 
 if [ -f ${CONFIG} ] ; then
 	. ${CONFIG}
@@ -66,11 +73,10 @@ if [ -f ${CONFIG} ] ; then
 		Error 1 "Today is not the day that I chuck."
 	fi
 fi
+
 if [ ! -d ${WORKDIR}/${LABEL} ] ; then
 	Error 1 "${LABEL} : no such configuration."
 fi
-
-[ $(id -u) -ne 0  ] && SUDO="sudo"
 
 if ([ -f ${WORKDIR}/embedded/common ] && [ ${WORKDIR}/${LABEL}/.embedded ]) ; then
 	${SUDO} cp ${WORKDIR}/embedded/common ${NANODIR}/embedded/
@@ -97,8 +103,9 @@ case ${TARGET} in
 	'diskimage')
 		NANOPT="-k -w -b"
 		;;
-	'install')
-		dd if=${DISKIMAGE} of=${NANO_DRIVE} bs=64k > /dev/null 2>&1
+	'burn'|'install')
+		${SUDO} dd if=${DISKIMAGE} of=${NANO_DRIVE} \
+			bs=64k > /dev/null 2>&1
 		;;
 	*)	
 		Usage
@@ -110,7 +117,8 @@ cd ${WORKDIR}
 ${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
 if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
 	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
-	${SUDO} cp ${WORKDIR}/${LABEL}/nanobsd.conf ${NANODIR}/embedded/${LABEL}.cfg
+	${SUDO} cp ${WORKDIR}/${LABEL}/nanobsd.conf \
+		${NANODIR}/embedded/${LABEL}.cfg
 	cd ${NANODIR}/embedded
 	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${LABEL}.cfg
 	rc=$?
