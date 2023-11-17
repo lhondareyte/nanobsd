@@ -37,6 +37,6 @@ Options depend of the board, see `/usr/local/share/u-boot/foo/README` for detail
 
 ### Optionnal packages
 
-You can add official packages à build time with `NANO_PACKAGES` option. For example:
+You can add official packages at build time with `NANO_PACKAGES` option. For example:
 
     NANO_PACKAGES="nginx modsecurity3-nginx"
