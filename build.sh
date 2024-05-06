@@ -84,7 +84,6 @@ fi
 
 . ${NANOCFG} 2>/dev/null
 
-[ ! -f ${KERNEL}  ] && KERNEL="${WORKDIR}/generic/kernel.conf"
 [ -z ${NANO_ARCH} ] && NANO_ARCH="amd64"
 [ -z ${NANO_MACH} ] && NANO_MACH=${NANO_ARCH}
 
@@ -114,7 +113,9 @@ esac
 touch ${LOCK}
 
 cd ${WORKDIR}
-${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
+if [ -f ${KERNEL} ] ; then
+	${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
+fi
 if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
 	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
 	${SUDO} cp ${WORKDIR}/${LABEL}/nanobsd.conf \
@@ -123,7 +124,6 @@ if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
 	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${LABEL}.cfg
 	rc=$?
 else
-	echo normal
 	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
 	rc=$?
 fi
