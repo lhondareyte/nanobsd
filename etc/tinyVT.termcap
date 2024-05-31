@@ -29,21 +29,20 @@
 # Termcap entry for AVR tinyVT
 # see http://lhondareyte.free.fr/tinyVT/ for details
 tinyVT|tinyVTa|Standard AVR tinyVT Terminal:\
-        :am:mi:co#25:li#2:xn:\
+        :am:mi:co#24:li#2:xn:\
         :pc=\040:cl=\EE:ho=\EH:\
         :cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
         :k1=\E[1~:k2=\E[2~:k3=\E[3~:\
         :k4=\E[4~:k5=\E[5~:k6=\E[6~:\
         :k7=\E[7~:k8=\E[8~:k9=\E[9~:
-        #:kd=\EOB:kr=\EOC:ku=\EOA:kd=\EOD:
-        #:kl=\E[L:kr=\E[R:ku=\E[U:kd=\E[D:
-        #:am:xn:mi:co#24:li#2: 
 #
 # Termcap entry for AVR tinyVT-MKII
 tinyVT-MKII|tinyVT2|Standard AVR tinyVT MKII Terminal:\
         :am:mi:co#40:li#2:xn:\
         :pc=\040:cl=\EE:ho=\EH:\
         :cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
-        :k1=\E[1~:k2=\E[2~:k3=\E[3~:\
-        :k4=\E[4~:k5=\E[5~:k6=\E[6~:\
-        :k7=\E[7~:k8=\E[8~:k9=\E[9~:
+	:kd=\EOB:kr=\EOC:ku=\EOA:kd=\EOD:\
+        :k1=\E[11~:k2=\E[12~:k3=\E[13~:\
+        :k4=\E[14~:k5=\E[15~:k6=\E[16~:\
+        :k7=\E[17~:k8=\E[18~:k9=\E[19~:\
+	:k10=\E[20~:
