@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 LOCK="/tmp/do_not_shutdown.lk"
-PATH=${PATH}:/usr/local/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 LABEL=$1
 TARGET=$2
 WORKDIR=$(dirname $0)
@@ -68,9 +68,9 @@ fi
 
 if [ -f ${CONFIG} ] ; then
 	. ${CONFIG}
-	TODAY="$(date +%d)"
+	TODAY="$(/bin/date +%d)"
 	if [ "${TODAY}" != "${DAY}" ] ; then
-		Error 1 "Today is not the day that I chuck."
+		Error 1 "Today is not the day that I chuck ($TODAY vs $DAY)."
 	fi
 fi
 
