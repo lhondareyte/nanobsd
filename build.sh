@@ -40,7 +40,7 @@ Mail () {
 		-name "${FULLNAME}" -q
 }
 
-Error() {
+Exit() {
 	local rc=$1 ; shift
 	local msg=$*
 	Mail "${msg}"
@@ -50,7 +50,7 @@ Error() {
 
 [ -z ${LABEL}  ] && Usage
 [ -z ${TARGET} ] && TARGET="all"
-[ ! -x ${NANOSCRIPT} ] && Error 1 "NanoBSD is not installed on this system."
+[ ! -x ${NANOSCRIPT} ] && Exit 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
 	'etc'|'install'|'embedded')
@@ -60,7 +60,7 @@ esac
 
 if [ ! -e $SUDO ] ; then
 	if [ $(id -u) -ne 0 ] ; then
-		Error 1 "Please install 'sudo' or run this script as root"
+		Exit 1 "Please install 'sudo' or run this script as root"
 	else
 		unset SUDO
 	fi
@@ -70,12 +70,12 @@ if [ -f ${CONFIG} ] ; then
 	. ${CONFIG}
 	TODAY="$(/bin/date +%d)"
 	if [ "${TODAY}" != "${DAY}" ] ; then
-		Error 1 "Today is not the day that I chuck ($TODAY vs $DAY)."
+		Exit 1 "Today is not the day that I chuck ($TODAY vs $DAY)."
 	fi
 fi
 
 if [ ! -d ${WORKDIR}/${LABEL} ] ; then
-	Error 1 "${LABEL} : no such configuration."
+	Exit 1 "${LABEL} : no such configuration."
 fi
 
 if ([ -f ${WORKDIR}/embedded/common ] && [ ${WORKDIR}/${LABEL}/.embedded ]) ; then
@@ -128,11 +128,8 @@ else
 	rc=$?
 fi
 
-if [ $rc -eq 0 ] ; then
-	Mail "${LABEL} build completed."
-else
-	Mail "${LABEL} build failed!"
+MSG="build completed."
+if [ $rc -ne 0 ] ; then
+	MSG="build failed."
 fi
-
-rm -f ${LOCK}
-exit $rc
+Exit $rc  "${LABEL} ${MSG}"
