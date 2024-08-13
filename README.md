@@ -29,7 +29,7 @@ Each directory include a patched `common` configuration file that fix the follow
 
 ### u-boot installation
 
-The resulting image is not bootable, you need to install the u-boot binary file which depend of your motherboard. In example, for a foo SBC, install u-boot-foo on your build system, then:
+The resulting image is not bootable, you need to install the u-boot SPL (Secondary Program Loader) which depend of your SBC. In example, for a foo SBC, install u-boot-foo on your build system, then:
 
     dd if=/usr/local/share/u-boot/foo/bar-spl.bin of=/dev/da0 bs=1k seek=8 conv=sync
 
