@@ -50,6 +50,7 @@ Exit() {
 
 [ -z ${LABEL}  ] && Usage
 [ -z ${TARGET} ] && TARGET="all"
+[ -f ${LOCK}   ] && Exit 1 "There is already a build in progress."
 [ ! -x ${NANOSCRIPT} ] && Exit 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
