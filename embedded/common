@@ -1,4 +1,3 @@
-# $FreeBSD$
 
 #-
 # Copyright (c) 2015 M. Warner Losh <imp@FreeBSD.org>
@@ -128,14 +127,14 @@ cust_install_machine_files ( ) (
 customize_cmd cust_install_files
 customize_cmd cust_install_machine_files 
 
-# NB: leave c++ enabled so devd can be built
 CONF_BUILD="
 LOCAL_XTOOL_DIRS=usr.bin/mkimg
 WITHOUT_ACPI=true
-WITHOUT_ATM=true
 WITHOUT_AUDIT=true
 WITHOUT_BLUETOOTH=true
 WITHOUT_CALENDAR=true
+WITHOUT_CLANG=true
+WITHOUT_CLANG_BOOTSTRAP=true
 WITHOUT_DICT=true
 WITHOUT_EXAMPLES=true
 WITHOUT_GAMES=true
@@ -217,7 +216,7 @@ create_diskimage_mbr ( ) (
 		if [ -d ${NANO_FAT_DIR} ]; then
 			# Need to copy files from ${NANO_FATDIR} with mtools, or use
 			# makefs -t msdos once that's supported
-			mcopy -si ${NANO_LOG}/_.${NANO_SLICE_FAT} ${NANO_FAT_DIR}/* ::
+			mcopy -s -i ${NANO_LOG}/_.${NANO_SLICE_FAT} ${NANO_FAT_DIR}/* ::
 		fi
 	fi
 
@@ -269,7 +268,7 @@ create_diskimage_mbr ( ) (
 	# boot off partition 3 or 2 by hand if you're playing around with this WIP
 	case ${NANO_LAYOUT} in
 	std-armv7)
-		# Layout for armv7 with EFI
+	# Layout for armv7 with EFI
 		mkimg -a 1 -s mbr -p ${s1}:=${NANO_LOG}/_.s1:1M \
 			-p ${s2}:=${NANO_LOG}/_.s2 \
 			-p ${s3}:=${NANO_LOG}/_.s3 \
@@ -287,8 +286,6 @@ create_diskimage_mbr ( ) (
 			-p- \
 			-p ${s3}:=${NANO_LOG}/_.s3 \
 			-o ${out}
-
-
 		;;
 	std-uefi)
 		# s1 is boot, s2 is cfg, s3 is /, not sure how to make that
@@ -420,11 +417,11 @@ fix_pkg ( ) (
 	echo "./pkg/cache type=dir uname=root gname=wheel mode=0755"
 	echo "./pkg/db type=dir uname=root gname=wheel mode=0755"
 	echo "./pkg/tmp type=dir uname=root gname=wheel mode=0755"
- 	echo "./usr/share/keys/ssl type=dir uname=root gname=wheel mode=0755"
- 	echo "./usr/share/keys/ssl/certs type=dir uname=root gname=wheel mode=0755"
- 	echo "./etc/ssl type=dir uname=root gname=wheel mode=0755"
- 	echo "./etc/ssl/blacklisted type=dir uname=root gname=wheel mode=0755"
- 	echo "./etc/ssl/certs type=dir uname=root gname=wheel mode=0755"
+	echo "./usr/share/keys/ssl type=dir uname=root gname=wheel mode=0755"
+	echo "./usr/share/keys/ssl/certs type=dir uname=root gname=wheel mode=0755"
+	echo "./etc/ssl type=dir uname=root gname=wheel mode=0755"
+	echo "./etc/ssl/blacklisted type=dir uname=root gname=wheel mode=0755"
+	echo "./etc/ssl/certs type=dir uname=root gname=wheel mode=0755"
 	) >> ${NANO_METALOG}
 )
 customize_cmd fix_pkg
@@ -468,7 +465,7 @@ dos_boot_part ( ) (
 	touch uEnv.txt
 
 	# Now we need to copy over dtb files from the build.
-	cp ${NANO_WORLDDIR}/boot/dtb/*.dtb .
+	find ${NANO_WORLDDIR}/boot/dtb/ -name "*.dtb" -exec cp {} . \;
 )
 
 if [ -n "$NANO_BOOT_PKG" ]; then
@@ -536,30 +533,12 @@ std_i386 ( ) {
 	: ${NANO_BOOT_BSD:=${NANO_WORLDDIR}/boot/boot}
 }
 
-std_mips ( ) {
-	NANO_ENDIAN=big
-}
-
-std_mipsel ( ) {
-}
-
-std_mips64 ( ) {
-	NANO_ENDIAN=big
-}
-
-std_mips64el ( ) {
-}
-
 std_powerpc ( ) {
 	NANO_ENDIAN=big
 }
 
 std_powerpc64 ( ) {
 	NANO_LAYOUT=powerpc64-ibm
-	NANO_ENDIAN=big
-}
-
-std_sparc64 ( ) {
 	NANO_ENDIAN=big
 }
 
@@ -653,6 +632,14 @@ esac
 
 
 NANO_SLICE_DATA=		# Not included
+
+# These don't make any sense to this strategy, so stub them out.
+calculate_partitioning ( ) (
+)
+
+# These don't make any sense to this strategy, so stub them out.
+create_code_slice ( ) (
+)
 
 # Each major disk scheme has its own routine. Generally
 # this is for mbr, gpt, etc. These are generally are widely
