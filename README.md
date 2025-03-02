@@ -1,6 +1,6 @@
 #  Nanobsd configuration scripts
 
-Scripts and configuration files to build NanoBSD images for amd64 and armv7.
+Scripts and configuration files to build NanoBSD images for amd64 (aka x86_64) and armv7.
 
 ## Howto
 
@@ -16,27 +16,27 @@ Edit `$HOME/.etc/build.conf` to set day of month, then
 
 ## ARMv7 plateform
 
-The following directories are configuration files for armv7 SOC :
+The following directories contain configuration files for armv7 SOC :
 
     armv7/
     nanopi-neo/
 
-Each directory include a patched `common` configuration file that fix the following PRs :
+include a patched `embbeded/common` configuration file that fix the following PRs :
 
  * [`PR255639`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=255639)
- * [`PR271078`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271078)
- * [`PR271098`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271098)
+ * ~[`PR271078`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271078)~
+ * ~[`PR271098`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271098)~
 
 ### u-boot installation
 
-The resulting image is not bootable, you need to install the u-boot SPL (Secondary Program Loader) which depend of your SBC. In example, for a foo SBC, install u-boot-foo on your build system, then:
+The resulting image is not bootable, you need to install the u-boot SPL (Secondary Program Loader) that depend on your SBC. In example, for a foo SBC, install u-boot-foo on your build system, then:
 
     dd if=/usr/local/share/u-boot/foo/bar-spl.bin of=/dev/da0 bs=1k seek=8 conv=sync
 
-Options depend of the board, see `/usr/local/share/u-boot/foo/README` for details.
+Options may vary, see `/usr/local/share/u-boot/foo/README` for details.
 
-### Optionnal packages
+### Optional packages
 
-You can add official packages at build time with `NANO_PACKAGES` option. For example:
+You can add official packages at build time with `NANO_PACKAGES` option: 
 
     NANO_PACKAGES="nginx modsecurity3-nginx"
