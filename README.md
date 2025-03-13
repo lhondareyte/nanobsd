@@ -31,7 +31,9 @@ include a patched `embbeded/common` configuration file that fix the following PR
 
 The resulting image is not bootable, you need to install the u-boot SPL (Secondary Program Loader) that depend on your SBC. In example, for a foo SBC, install u-boot-foo on your build system, then:
 
-    dd if=/usr/local/share/u-boot/foo/bar-spl.bin of=/path/to/foo.img bs=1k seek=8 conv=sync,notrunc
+    dd if=/usr/local/share/u-boot/foo/bar-spl.bin \
+        of=/path/to/foo.img bs=1k \
+	seek=8 conv=sync,notrunc
 
 Options may vary, see `/usr/local/share/u-boot/foo/README` for details.
 
