@@ -4,7 +4,7 @@ Scripts and configuration files to build NanoBSD images for amd64 (aka x86_64) a
 
 ## Howto
 
-To build a generic `nanobsd` image:
+To build a generic amd64 `nanobsd` image:
 
     git clone https://github.com/lhondareyte/nanobsd.git  
     cd nanobsd/install  && make install
@@ -12,7 +12,7 @@ To build a generic `nanobsd` image:
 
 Edit `$HOME/.etc/build.conf` to set day of month, then
 
-    ./build.sh generic all
+    ./build.sh amd64
 
 ## ARMv7 plateform
 
