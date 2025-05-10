@@ -116,7 +116,10 @@ touch ${LOCK}
 cd ${WORKDIR}
 if [ -f ${KERNEL} ] ; then
 	${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
+else
+	${SUDO} cp ${NANO_MACH}/kernel.conf /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
 fi
+
 if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
 	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
 	${SUDO} cp ${WORKDIR}/${LABEL}/nanobsd.conf \
