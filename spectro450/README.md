@@ -1,0 +1,5 @@
+# Requirements
+
+* cmake
+* ninja
+* pkgconf
