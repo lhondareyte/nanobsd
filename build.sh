@@ -41,6 +41,10 @@ Mail () {
 }
 
 Exit() {
+	mnt=$(mount | awk '/nanobsd/ {print $3}')
+	[ ! -z $mnt ] && ${SUDO} umount $mnt
+	mnt=$(mount | awk '/embedded/ {print $3}')
+	[ ! -z $mnt ] && ${SUDO} umount $mnt
 	local rc=$1 ; shift
 	local msg=$*
 	Mail "${msg}"
