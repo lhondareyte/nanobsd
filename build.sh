@@ -89,6 +89,9 @@ fi
 
 . ${NANOCFG} 2>/dev/null
 
+if ([ ! -z ${NANO_LOCAL_PACKAGES} ] && [ ! -f /usr/ports/Mk/bsd.port.mk ]) ; then
+	Exit 1 "Ports are not installed"
+fi
 [ -z ${NANO_ARCH} ] && NANO_ARCH="amd64"
 [ -z ${NANO_MACH} ] && NANO_MACH=${NANO_ARCH}
 
