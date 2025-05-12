@@ -1,5 +1,10 @@
 #!/bin/sh
 #
+# Copyright (c)2022-2025  Luc Hondareyte
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause
+#
 LOCK="/tmp/do_not_shutdown.lk"
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 LABEL=$1
