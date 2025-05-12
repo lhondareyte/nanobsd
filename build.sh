@@ -14,15 +14,12 @@ NANODIR="/usr/src/tools/tools/nanobsd"
 NANOSCRIPT="${NANODIR}/nanobsd.sh"
 KERNEL="${WORKDIR}/${LABEL}/kernel.conf"
 NANOCFG="${WORKDIR}/${LABEL}/nanobsd.conf"
-
-Usage () {
-	echo "Usage : $(basename $0) <label> [all|world|kernel|diskimage|burn]"
-	exit 1
-}
+NOMAIL="no"
 
 Mail () {
 	MSG=$1 
 	echo ${MSG}
+	[ ${NOMAIL} = "yes"  ] && return
 	[ ${MAIL} = "no"     ] && return
 	[ ! -f ${SMTPCONFIG} ] && return
 	[ ! -x ${MAILSEND}   ] && return
@@ -41,15 +38,25 @@ Mail () {
 }
 
 Exit() {
+	local rc=$1
+	if [ "${rc}" = "--no-mail" ] ; then
+		NOMAIL="yes"
+		shift
+		rc=$1
+	fi
+	shift
 	mnt=$(mount | awk '/nanobsd/ {print $3}')
 	[ ! -z $mnt ] && ${SUDO} umount $mnt
 	mnt=$(mount | awk '/embedded/ {print $3}')
 	[ ! -z $mnt ] && ${SUDO} umount $mnt
-	local rc=$1 ; shift
 	local msg=$*
 	Mail "${msg}"
 	rm -f ${LOCK}
 	exit ${rc}
+}
+
+Usage () {
+	Exit --no-mail 1 "Usage : $(basename $0) <label> [all|world|kernel|diskimage|burn]"
 }
 
 [ -z ${LABEL}  ] && Usage
