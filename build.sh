@@ -75,6 +75,10 @@ case ${LABEL} in
 		;;
 esac
 
+if [ ! -d ${WORKDIR}/${LABEL} ] ; then
+	Exit --no-mail 1 "${LABEL} : no such configuration."
+fi
+
 if [ ! -e $SUDO ] ; then
 	if [ $(id -u) -ne 0 ] ; then
 		Exit 1 "Please install 'sudo' or run this script as root"
@@ -89,10 +93,6 @@ if [ -f ${CONFIG} ] ; then
 	if [ "${TODAY}" != "${DAY}" ] ; then
 		Exit 1 "Today is not the day that I chuck ($TODAY vs $DAY)."
 	fi
-fi
-
-if [ ! -d ${WORKDIR}/${LABEL} ] ; then
-	Exit 1 "${LABEL} : no such configuration."
 fi
 
 if ([ -f ${WORKDIR}/embedded/common ] && [ ${WORKDIR}/${LABEL}/.embedded ]) ; then
