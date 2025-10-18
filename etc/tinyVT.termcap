@@ -1,7 +1,7 @@
 #
 # This file is part of the tinyVT Project.
 #
-# Copyright (c)2016-2020  Luc Hondareyte
+# Copyright (c)2016-2025  Luc Hondareyte
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,12 +32,12 @@ tinyVT|tinyVTa|Standard AVR tinyVT Terminal:\
         :am:mi:co#24:li#2:xn:\
         :pc=\040:cl=\EE:ho=\EH:\
         :cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
-        :k1=\E[1~:k2=\E[2~:k3=\E[3~:\
-        :k4=\E[4~:k5=\E[5~:k6=\E[6~:\
-        :k7=\E[7~:k8=\E[8~:k9=\E[9~:
+        :k1=\E[11~:k2=\E[12~:k3=\E[13~:\
+        :k4=\E[14~:k5=\E[15~:k6=\E[16~:\
+        :k7=\E[17~:k8=\E[18~:k9=\E[19~:
 #
-# Termcap entry for AVR tinyVT-MKII
-tinyVT-MKII|tinyVT2|Standard AVR tinyVT MKII Terminal:\
+# Termcap entry for STM32 tinyVT-MKII
+tinyVT-MKII|tinyVT2|Standard STM32 tinyVT MKII Terminal:\
         :am:mi:co#40:li#2:xn:\
         :pc=\040:cl=\EE:ho=\EH:\
         :cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
@@ -45,4 +45,7 @@ tinyVT-MKII|tinyVT2|Standard AVR tinyVT MKII Terminal:\
         :k1=\E[11~:k2=\E[12~:k3=\E[13~:\
         :k4=\E[14~:k5=\E[15~:k6=\E[16~:\
         :k7=\E[17~:k8=\E[18~:k9=\E[19~:\
-	:k10=\E[20~:
+	:k10=\E[20~:k11:\E[21~:k12:\E[22~:\
+	:k13:\E[23~:k14:\E[24~:k15:\E[25~:\
+	:k16:\E[26~:k27:\E[27~:k28:\E[28~:\
+	:k19:\E[29~:k30:\E[31~:k32:\E[32~:\
