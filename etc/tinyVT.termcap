@@ -29,23 +29,23 @@
 # Termcap entry for AVR tinyVT
 # see http://lhondareyte.free.fr/tinyVT/ for details
 tinyVT|tinyVTa|Standard AVR tinyVT Terminal:\
-        :am:mi:co#24:li#2:xn:\
-        :pc=\040:cl=\EE:ho=\EH:\
-        :cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
-        :k1=\E[11~:k2=\E[12~:k3=\E[13~:\
-        :k4=\E[14~:k5=\E[15~:k6=\E[16~:\
-        :k7=\E[17~:k8=\E[18~:k9=\E[19~:
+	:am:mi:co#24:li#2:xn:\
+	:pc=\040:cl=\EE:ho=\EH:\
+	:cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
+	:k1=\E[11~:k2=\E[12~:k3=\E[13~:\
+	:k4=\E[14~:k5=\E[15~:k6=\E[16~:\
+	:k7=\E[17~:k8=\E[18~:k9=\E[19~:
 #
 # Termcap entry for STM32 tinyVT-MKII
 tinyVT-MKII|tinyVT2|Standard STM32 tinyVT MKII Terminal:\
-        :am:mi:co#40:li#2:xn:\
-        :pc=\040:cl=\EE:ho=\EH:\
-        :cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
+	:am:mi:co#40:li#2:xn:\
+	:pc=\040:cl=\EE:ho=\EH:\
+	:cm=\EY%+ %+ :ve=\EC:vi=\Ec:\
 	:kd=\EOB:kr=\EOC:ku=\EOA:kd=\EOD:\
-        :k1=\E[11~:k2=\E[12~:k3=\E[13~:\
-        :k4=\E[14~:k5=\E[15~:k6=\E[16~:\
-        :k7=\E[17~:k8=\E[18~:k9=\E[19~:\
-	:k10=\E[20~:k11:\E[21~:k12:\E[22~:\
-	:k13:\E[23~:k14:\E[24~:k15:\E[25~:\
-	:k16:\E[26~:k27:\E[27~:k28:\E[28~:\
-	:k19:\E[29~:k30:\E[31~:k32:\E[32~:\
+	:k1=\E[11~:k2=\E[12~:k3=\E[13~:\
+	:k4=\E[14~:k5=\E[15~:k6=\E[16~:\
+	:k7=\E[17~:k8=\E[18~:k9=\E[19~:\
+	:k10=\E[20~:k11=\E[21~:k12=\E[22~:\
+	:k13=\E[23~:k14=\E[24~:k15=\E[25~:\
+	:k16=\E[26~:k27=\E[27~:k28=\E[28~:\
+	:k19=\E[29~:k30=\E[31~:k32=\E[32~:
