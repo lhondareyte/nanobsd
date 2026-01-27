@@ -23,9 +23,7 @@ The following directories contain configuration files for armv7 SOC :
 
 include a patched `embbeded/common` configuration file that fix the following PRs :
 
- * [`PR255639`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=255639)
- * ~[`PR271078`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271078)~
- * ~[`PR271098`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271098)~
+ * [`PR271098`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271098)
 
 ### u-boot installation
 
