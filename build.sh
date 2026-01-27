@@ -96,7 +96,7 @@ if [ -f ${CONFIG} ] ; then
 fi
 
 if ([ -f ${WORKDIR}/embedded/common ] && [ ${WORKDIR}/${LABEL}/.embedded ]) ; then
-	${SUDO} cp ${WORKDIR}/embedded/common ${NANODIR}/embedded/
+	${SUDO} cp ${WORKDIR}/embedded/common ${NANODIR}/embedded/common.local
 fi
 
 . ${NANOCFG} 2>/dev/null
