@@ -7,12 +7,10 @@ Scripts and configuration files to build NanoBSD images for amd64 (aka x86_64) a
 To build a generic amd64 `nanobsd` image:
 
     git clone https://github.com/lhondareyte/nanobsd.git  
-    cd nanobsd/install  && make install
-    cd ..
-
-Edit `$HOME/.etc/build.conf` to set day of month, then
-
+    cd nanobsd/
     ./build.sh amd64
+
+The resulting image
 
 ## ARMv7 plateform
 
@@ -21,7 +19,7 @@ The following directories contain configuration files for armv7 SOC :
     armv7/
     nanopi-neo/
 
-include a patched `embbeded/common` configuration file that fix the following PRs :
+include a patched `embbeded/common` configuration file that fix the following PR(s) :
 
  * [`PR271098`](https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271098)
 
