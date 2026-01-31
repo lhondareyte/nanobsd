@@ -1,16 +1,18 @@
-#  Nanobsd configuration scripts
+#  NanoBSD configuration scripts
 
 Scripts and configuration files to build NanoBSD images for amd64 (aka x86_64) and armv7.
 
 ## Howto
 
-To build a generic amd64 `nanobsd` image:
+To build a generic amd64 image:
 
     git clone https://github.com/lhondareyte/nanobsd.git  
     cd nanobsd/
     ./build.sh amd64
 
-The resulting image
+the resulting image is:
+
+    /usr/obj/nanobsd.NANOBSD/_.disk.full
 
 ## ARMv7 plateform
 
