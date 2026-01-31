@@ -409,16 +409,20 @@ fix_pkg ( ) (
 	(
 	echo 'PKG_DBDIR = "/pkg/db"'
 	echo 'PKG_CACHEDIR = "/pkg/cache"'
-	echo 'DEFAULT_ALWAYS_YES = "yes"'
-	echo 'ASSUME_ALWAYS_YES = "yes"'
+	echo 'DEFAULT_ALWAYS_YES = TRUE'
+	echo 'ASSUME_ALWAYS_YES = TRUE'
 	) >> usr/local/etc/pkg.conf
-	[ -z ${NANO_NOPRIV_BUILD} ] || (
+	(
+	echo 'FreeBSD-ports: { url: "pkg+https://pkg.FreeBSD.org/${ABI}/latest", mirror_type: "srv", enabled: yes }'
+	) > etc/pkg/FreeBSD.conf
+	[ -z "${NANO_NOPRIV_BUILD}" ] || (
 	echo "./pkg type=dir uname=root gname=wheel mode=0755"
 	echo "./pkg/cache type=dir uname=root gname=wheel mode=0755"
 	echo "./pkg/db type=dir uname=root gname=wheel mode=0755"
 	echo "./pkg/tmp type=dir uname=root gname=wheel mode=0755"
 	echo "./usr/share/keys/ssl type=dir uname=root gname=wheel mode=0755"
 	echo "./usr/share/keys/ssl/certs type=dir uname=root gname=wheel mode=0755"
+	echo "./usr/share/pkg type=dir uname=root gname=wheel mode=0755"
 	echo "./etc/ssl type=dir uname=root gname=wheel mode=0755"
 	echo "./etc/ssl/blacklisted type=dir uname=root gname=wheel mode=0755"
 	echo "./etc/ssl/certs type=dir uname=root gname=wheel mode=0755"
