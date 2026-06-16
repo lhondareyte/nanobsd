@@ -23,7 +23,6 @@ NOMAIL="no"
 
 Mail () {
 	MSG=$1 
-	echo ${MSG}
 	[ ${NOMAIL} = "yes"  ] && return
 	[ ${MAIL} = "no"     ] && return
 	[ ! -f ${SMTPCONFIG} ] && return
@@ -43,18 +42,19 @@ Mail () {
 }
 
 Exit() {
-	local rc=$1
+	rc=$1
 	if [ "${rc}" = "--no-mail" ] ; then
 		NOMAIL="yes"
 		shift
 		rc=$1
 	fi
 	shift
+	msg=$*
+	echo "${msg}"
 	mnt=$(mount | awk '/nanobsd/ {print $3}')
 	[ ! -z $mnt ] && ${SUDO} umount $mnt
 	mnt=$(mount | awk '/embedded/ {print $3}')
 	[ ! -z $mnt ] && ${SUDO} umount $mnt
-	local msg=$*
 	Mail "${msg}"
 	rm -f ${LOCK}
 	exit ${rc}
