@@ -42,14 +42,14 @@ Mail () {
 }
 
 Exit() {
-	local rc=$1
+	rc=$1
 	if [ "${rc}" = "--no-mail" ] ; then
 		NOMAIL="yes"
 		shift
 		rc=$1
 	fi
 	shift
-	local msg=$*
+	msg=$*
 	echo "${msg}"
 	mnt=$(mount | awk '/nanobsd/ {print $3}')
 	[ ! -z $mnt ] && ${SUDO} umount $mnt
