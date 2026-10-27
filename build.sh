@@ -1,36 +1,45 @@
 #!/bin/sh
 #
-# Copyright (c)2022-2025  Luc Hondareyte
+# Copyright (c)2022-2026  Luc Hondareyte
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
 
+PRG="$(basename "${0}")"
 LOCK="/tmp/do_not_shutdown.lk"
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
-LABEL=$1
-TARGET=$2
-WORKDIR="$(dirname $0)"
+LABEL="${1}"
+TARGET="${2}"
 CONFIG="${HOME}/.etc/build.conf"
 SMTPCONFIG="${HOME}/.etc/smtp.conf"
 MAILSEND="/usr/local/bin/mailsend"
 SUDO="/usr/local/bin/sudo"
 
-NANODIR="/usr/src/tools/tools/nanobsd"
+SOURCES="/usr/src"
+
+WORKDIR="$(dirname "${0}")"
+EMBEDDED="${WORKDIR}/embedded"
+NANODIR="${SOURCES}/tools/tools/nanobsd"
 NANOSCRIPT="${NANODIR}/nanobsd.sh"
 KERNEL="${WORKDIR}/${LABEL}/kernel.conf"
 NANOCFG="${WORKDIR}/${LABEL}/nanobsd.conf"
 MAIL="no"
 LOCKED="no"
 
+Usage () {
+	Exit --no-mail 1 "Usage : ${PRG} <label> [all|world|kernel|diskimage]"
+}
+
 Mail () {
 	MSG=$1 
+	echo "${MSG}"
 	[ "${MAIL}" = "no"     ] && return
 	[ ! -f "${SMTPCONFIG}" ] && return
 	[ ! -x "${MAILSEND}"   ] && return
 
-	. ${SMTPCONFIG}
-	printf "${MSG}\nKisses.\n\n- Send from $(hostname) -" | ${MAILSEND} \
+	. "${SMTPCONFIG}"
+	printf '%s\nKisses.\n\n- Send from %s -' "${MSG}" "$(hostname)" | ${MAILSEND} \
 		-starttls -auth-login \
 		-smtp ${SERVER} \
 		-port ${PORT} \
@@ -51,33 +60,28 @@ Exit() {
 	fi
 	shift
 	msg=$*
-	echo "${msg}"
 	if [ "${LOCKED}" = "yes" ] ; then
 		mnt=$(mount | awk '/nanobsd/ {print $3}')
-		[ ! -z $mnt ] && ${SUDO} umount $mnt
+		if ! ([ ! -z "${mnt}" ] && ${SUDO} umount "${mnt}") ; then
+			echo "Failed to umount ${mnt}"
+		fi
 		mnt=$(mount | awk '/embedded/ {print $3}')
-		[ ! -z $mnt ] && ${SUDO} umount $mnt
-		rmdir ${LOCK}
-	else
-		rc=1
+		if ! ([ ! -z "${mnt}" ] && ${SUDO} umount "${mnt}") ; then
+			echo "Failed to umount ${mnt}"
+		fi
+		rmdir "${LOCK}"
 	fi
 	Mail "${msg}"
 	exit ${rc}
 }
 
-Usage () {
-	Exit --no-mail 1 "Usage : $(basename $0) <label> [all|world|kernel|diskimage|burn]"
-}
+trap 'Exit 1 "Something went wrong"' 1 2 5 6
 
 [ -z "${LABEL}"  ] && Usage
 [ -z "${TARGET}" ] && TARGET="all"
-if  ! mkdir "${LOCK}" ; then 
-	Exit 1 "There is already a build in progress."
-fi
-LOCKED="yes"
 [ ! -x "${NANOSCRIPT}" ] && Exit 1 "NanoBSD is not installed on this system."
 
-case ${LABEL} in
+case "${LABEL}" in
 	'etc'|'install'|'embedded')
 		Usage
 		;;
@@ -87,7 +91,7 @@ if [ ! -d "${WORKDIR}/${LABEL}" ] ; then
 	Exit --no-mail 1 "${LABEL} : no such configuration."
 fi
 
-if [ ! -e $SUDO ] ; then
+if [ ! -e "$SUDO" ] ; then
 	if [ $(id -u) -ne 0 ] ; then
 		Exit 1 "Please install 'sudo' or run this script as root"
 	else
@@ -99,21 +103,27 @@ if [ -f "${CONFIG}" ] ; then
 	. "${CONFIG}"
 	TODAY="$(/bin/date +%d)"
 	if [ "${TODAY}" != "${DAY}" ] ; then
-		Exit 1 "Today is not the day that I chuck ($TODAY vs $DAY)."
+		Exit 1 "Today is the day that I chuck."
 	fi
 fi
 
-if ([ -f "${WORKDIR}/embedded/common" ] && [ -f "${WORKDIR}/${LABEL}/.embedded" ]) ; then
-	${SUDO} cp "${WORKDIR}/embedded/common" "${NANODIR}/embedded/common.local"
+if  ! mkdir "${LOCK}" ; then 
+	Exit 1 "There is already a build in progress."
+fi
+LOCKED="yes"
+
+if ([ -f "${EMBEDDED}/common" ] && [ -f "${WORKDIR}/${LABEL}/.embedded" ]) ; then
+	${SUDO} cp "${EMBEDDED}/common" "${NANODIR}/embedded/common.local"
 fi
 
 . ${NANOCFG} 2>/dev/null
 
-if ([ ! -z ${NANO_LOCAL_PACKAGES} ] && [ ! -f /usr/ports/Mk/bsd.port.mk ]) ; then
+if ([ ! -z "${NANO_LOCAL_PACKAGES}" ] && [ ! -f /usr/ports/Mk/bsd.port.mk ]) ; then
 	Exit 1 "Ports are not installed"
 fi
-[ -z ${NANO_ARCH} ] && NANO_ARCH="amd64"
-[ -z ${NANO_MACH} ] && NANO_MACH=${NANO_ARCH}
+
+NANO_ARCH="${NANO_ARCH:-amd64}"
+NANO_MACH="${NANO_MACH:-$NANO_ARCH}"
 
 DISKIMAGE="/usr/obj/nanobsd.${NANO_NAME}/_.disk.full"
 
@@ -143,15 +153,23 @@ case ${TARGET} in
 esac
 
 if [ -f "${KERNEL}" ] ; then
-	${SUDO} cp "${KERNEL}" "/usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}"
+	if ! ( ${SUDO} cp "${KERNEL}" \ 
+	                  "${SOURCES}/sys/${NANO_MACH}/conf/${NANO_KERNEL}" ) ; then
+		Exit 1 "Failed to copy kernel configuration file"
+	fi
 else
-	${SUDO} cp "${WORKDIR}/${NANO_MACH}/kernel.conf" "/usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}"
+	if ! (${SUDO} cp "${WORKDIR}/${NANO_MACH}/kernel.conf" \
+	           "${SOURCES}/sys/${NANO_MACH}/conf/${NANO_KERNEL}") ; then
+		Exit 1 "Failed to copy kernel configuration file"
+	fi
 fi
 
 if [ -f "${WORKDIR}/${LABEL}/.embedded" ] ; then
 	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
-	${SUDO} cp "${WORKDIR}/${LABEL}/nanobsd.conf" \
-		"${NANODIR}/embedded/${LABEL}.cfg"
+	if ! (${SUDO} cp "${WORKDIR}/${LABEL}/nanobsd.conf" \
+	           "${NANODIR}/embedded/${LABEL}.cfg") ; then
+		Exit 1 "Failed to copy nanobsd configuration file"
+	fi
 
 	cd ${NANODIR}/embedded && \
 	${SUDO} /bin/sh "${NANOSCRIPT}" "${NANOPT}" -c "${LABEL}.cfg"
