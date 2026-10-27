@@ -5,11 +5,12 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
+
 LOCK="/tmp/do_not_shutdown.lk"
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
 LABEL=$1
 TARGET=$2
-WORKDIR=$(dirname $0)
+WORKDIR="$(dirname $0)"
 CONFIG="${HOME}/.etc/build.conf"
 SMTPCONFIG="${HOME}/.etc/smtp.conf"
 MAILSEND="/usr/local/bin/mailsend"
@@ -19,14 +20,14 @@ NANODIR="/usr/src/tools/tools/nanobsd"
 NANOSCRIPT="${NANODIR}/nanobsd.sh"
 KERNEL="${WORKDIR}/${LABEL}/kernel.conf"
 NANOCFG="${WORKDIR}/${LABEL}/nanobsd.conf"
-NOMAIL="no"
+MAIL="no"
+LOCKED="no"
 
 Mail () {
 	MSG=$1 
-	[ ${NOMAIL} = "yes"  ] && return
-	[ ${MAIL} = "no"     ] && return
-	[ ! -f ${SMTPCONFIG} ] && return
-	[ ! -x ${MAILSEND}   ] && return
+	[ "${MAIL}" = "no"     ] && return
+	[ ! -f "${SMTPCONFIG}" ] && return
+	[ ! -x "${MAILSEND}"   ] && return
 
 	. ${SMTPCONFIG}
 	printf "${MSG}\nKisses.\n\n- Send from $(hostname) -" | ${MAILSEND} \
@@ -44,19 +45,23 @@ Mail () {
 Exit() {
 	rc=$1
 	if [ "${rc}" = "--no-mail" ] ; then
-		NOMAIL="yes"
+		MAIL="no"
 		shift
 		rc=$1
 	fi
 	shift
 	msg=$*
 	echo "${msg}"
-	mnt=$(mount | awk '/nanobsd/ {print $3}')
-	[ ! -z $mnt ] && ${SUDO} umount $mnt
-	mnt=$(mount | awk '/embedded/ {print $3}')
-	[ ! -z $mnt ] && ${SUDO} umount $mnt
+	if [ "${LOCKED}" = "yes" ] ; then
+		mnt=$(mount | awk '/nanobsd/ {print $3}')
+		[ ! -z $mnt ] && ${SUDO} umount $mnt
+		mnt=$(mount | awk '/embedded/ {print $3}')
+		[ ! -z $mnt ] && ${SUDO} umount $mnt
+		rmdir ${LOCK}
+	else
+		rc=1
+	fi
 	Mail "${msg}"
-	rm -f ${LOCK}
 	exit ${rc}
 }
 
@@ -64,10 +69,13 @@ Usage () {
 	Exit --no-mail 1 "Usage : $(basename $0) <label> [all|world|kernel|diskimage|burn]"
 }
 
-[ -z ${LABEL}  ] && Usage
-[ -z ${TARGET} ] && TARGET="all"
-[ -f ${LOCK}   ] && Exit 1 "There is already a build in progress."
-[ ! -x ${NANOSCRIPT} ] && Exit 1 "NanoBSD is not installed on this system."
+[ -z "${LABEL}"  ] && Usage
+[ -z "${TARGET}" ] && TARGET="all"
+if  ! mkdir "${LOCK}" ; then 
+	Exit 1 "There is already a build in progress."
+fi
+LOCKED="yes"
+[ ! -x "${NANOSCRIPT}" ] && Exit 1 "NanoBSD is not installed on this system."
 
 case ${LABEL} in
 	'etc'|'install'|'embedded')
@@ -75,7 +83,7 @@ case ${LABEL} in
 		;;
 esac
 
-if [ ! -d ${WORKDIR}/${LABEL} ] ; then
+if [ ! -d "${WORKDIR}/${LABEL}" ] ; then
 	Exit --no-mail 1 "${LABEL} : no such configuration."
 fi
 
@@ -87,16 +95,16 @@ if [ ! -e $SUDO ] ; then
 	fi
 fi
 
-if [ -f ${CONFIG} ] ; then
-	. ${CONFIG}
+if [ -f "${CONFIG}" ] ; then
+	. "${CONFIG}"
 	TODAY="$(/bin/date +%d)"
 	if [ "${TODAY}" != "${DAY}" ] ; then
 		Exit 1 "Today is not the day that I chuck ($TODAY vs $DAY)."
 	fi
 fi
 
-if ([ -f ${WORKDIR}/embedded/common ] && [ ${WORKDIR}/${LABEL}/.embedded ]) ; then
-	${SUDO} cp ${WORKDIR}/embedded/common ${NANODIR}/embedded/common.local
+if ([ -f "${WORKDIR}/embedded/common" ] && [ -f "${WORKDIR}/${LABEL}/.embedded" ]) ; then
+	${SUDO} cp "${WORKDIR}/embedded/common" "${NANODIR}/embedded/common.local"
 fi
 
 . ${NANOCFG} 2>/dev/null
@@ -123,31 +131,30 @@ case ${TARGET} in
 		NANOPT="-k -w -b"
 		;;
 	'burn'|'install')
-		${SUDO} dd if=${DISKIMAGE} of=${NANO_DRIVE} \
-			bs=64k > /dev/null 2>&1
+		${SUDO} dd if="${DISKIMAGE}" of="${NANO_DRIVE}" bs=64k 
+		Exit $?
 		;;
 	*)	
 		Usage
 		;;
 esac
-touch ${LOCK}
 
-cd ${WORKDIR}
-if [ -f ${KERNEL} ] ; then
-	${SUDO} cp ${KERNEL} /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
+if [ -f "${KERNEL}" ] ; then
+	${SUDO} cp "${KERNEL}" "/usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}"
 else
-	${SUDO} cp ${NANO_MACH}/kernel.conf /usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}
+	${SUDO} cp "${WORKDIR}/${NANO_MACH}/kernel.conf" "/usr/src/sys/${NANO_MACH}/conf/${NANO_KERNEL}"
 fi
 
-if [ -f ${WORKDIR}/${LABEL}/.embedded ] ; then
+if [ -f "${WORKDIR}/${LABEL}/.embedded" ] ; then
 	DISKIMAGE="/usr/embedded/images/_.disk.image.${NANO_NAME}"
-	${SUDO} cp ${WORKDIR}/${LABEL}/nanobsd.conf \
-		${NANODIR}/embedded/${LABEL}.cfg
-	cd ${NANODIR}/embedded
-	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${LABEL}.cfg
+	${SUDO} cp "${WORKDIR}/${LABEL}/nanobsd.conf" \
+		"${NANODIR}/embedded/${LABEL}.cfg"
+
+	cd ${NANODIR}/embedded && \
+	${SUDO} /bin/sh "${NANOSCRIPT}" "${NANOPT}" -c "${LABEL}.cfg"
 	rc=$?
 else
-	${SUDO} /bin/sh ${NANOSCRIPT} ${NANOPT} -c ${NANOCFG}
+	${SUDO} /bin/sh "${NANOSCRIPT}" "${NANOPT}" -c "${NANOCFG}"
 	rc=$?
 fi
 
@@ -155,4 +162,4 @@ MSG="build completed."
 if [ $rc -ne 0 ] ; then
 	MSG="build failed."
 fi
-Exit $rc  "${LABEL} ${MSG}"
+Exit $rc "${LABEL} ${MSG}"
