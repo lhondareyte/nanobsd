@@ -131,8 +131,11 @@ case ${TARGET} in
 		NANOPT="-k -w -b"
 		;;
 	'burn'|'install')
-		${SUDO} dd if="${DISKIMAGE}" of="${NANO_DRIVE}" bs=64k 
-		Exit $?
+		if ${SUDO} dd if="${DISKIMAGE}" of="${NANO_DRIVE}" bs=64k ; then
+    			Exit 0 "${LABEL} : disk image written."
+		else
+    			Exit 1 "${LABEL} : disk image write failed."
+		fi
 		;;
 	*)	
 		Usage
