@@ -62,11 +62,11 @@ Exit() {
 	msg=$*
 	if [ "${LOCKED}" = "yes" ] ; then
 		mnt=$(mount | awk '/nanobsd/ {print $3}')
-		if ! ([ ! -z "${mnt}" ] && ${SUDO} umount "${mnt}") ; then
+		if ! ([ ! -z "${mnt}" ] && ${SUDO} umount "${mnt}" || : ) ; then
 			echo "Failed to umount ${mnt}"
 		fi
 		mnt=$(mount | awk '/embedded/ {print $3}')
-		if ! ([ ! -z "${mnt}" ] && ${SUDO} umount "${mnt}") ; then
+		if ! ([ ! -z "${mnt}" ] && ${SUDO} umount "${mnt}" || : ) ; then
 			echo "Failed to umount ${mnt}"
 		fi
 		rmdir "${LOCK}"
