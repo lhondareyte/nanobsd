@@ -152,6 +152,8 @@ case ${TARGET} in
 		;;
 esac
 
+cd "${WORKDIR}"
+
 if [ -f "${KERNEL}" ] ; then
 	if ! ( ${SUDO} cp "${KERNEL}" \ 
 	                  "${SOURCES}/sys/${NANO_MACH}/conf/${NANO_KERNEL}" ) ; then
